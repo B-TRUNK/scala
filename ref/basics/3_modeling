@@ -1,0 +1,114 @@
+OOP Domain Modeling
+
+When writing code in an OOP style, your two main tools for data encapsulation are traits and classes.
+Traits
+Scala traits can be used as simple interfaces, but they can also contain abstract and concrete methods and fields, and they can have parameters, just like classes. They provide a great way for you to organize behaviors into small, modular units. Later, when you want to create concrete implementations of attributes and behaviors, classes and objects can extend traits, mixing in as many traits as needed to achieve the desired behavior.
+
+trait Speaker: 
+def speak(): String 
+// has no body, so it’s abstract 
+
+trait TailWagger: 
+  def startTail(): Unit = println("tail is    wagging")
+
+  def stopTail(): 
+  Unit = println("tail is stopped")
+
+trait Runner: 
+  def startRunning(): Unit =                     println("I’m running") 
+
+  def stopRunning(): Unit =                     println("Stopped running")
+
+class Dog(name: String) extends Speaker, TailWagger, Runner: 
+def speak(): String = "Woof!"
+
+class Cat(name: String) extends Speaker, TailWagger, Runner:
+def speak(): String = "Meow" override def startRunning(): Unit = println("Yeah ... I don’t run") 
+override def stopRunning(): Unit = println("No need to stop")
+
+val d = Dog("Rover") println(d.speak()) // prints "Woof!" val c = Cat("Morris") println(c.speak()) // "Meow" c.startRunning() // "Yeah ... I don’t run" c.stopRunning() // "No need to stop"
+
+FP Domain Modeling
+When writing code in an FP style, you’ll use these concepts:
+• Algebraic Data Types to define the data
+• Traits for functionality on the data.
+
+Enumerations and Sum Types
+
+Sum types are one way to model algebraic data types (ADTs) in Scala.
+They are used when data can be represented with different choices.
+For instance, a pizza has three main attributes:
+
+• Crust size
+• Crust type
+• Toppings
+
+These are concisely modeled with enumerations, which are sum types that only contain singleton values:
+
+Scala 3 offers the enum construct for defining enumerations:
+
+enum CrustSize: 
+  case Small, Medium, Large
+
+enum CrustType: case Thin, Thick,       Regular 
+
+enum Topping:
+  case Cheese, Pepperoni,                      BlackOlives, GreenOlives, Onions
+
+Once you have an enumeration you can import its members as ordinary values:
+
+import CrustSize.*
+
+val currentCrustSize = Small 
+
+// enums in a `match` expression
+currentCrustSize match
+  case Small     => println("Small            crust size")
+
+  case Medium => println("Medium      crust size") 
+
+  case Large => println("Large crust     size") 
+
+// enums in an `if` statement 
+if currentCrustSize == Small then println("Small crust size")
+
+Here’s another example of how to create a sum type with Scala, this would not be called an enumeration because the Succ case has parameters:
+
+enum Nat: 
+  case Zero 
+  case Succ(pred: Nat)
+
+Product Types
+A product type is an algebraic data type (ADT) that only has one shape, for example a singleton object, represented in Scala by a case object; or an immutable structure with accessible fields, represented by a case class.
+A case class has all of the functionality of a class, and also has additional features baked in that make them useful for functional programming. When the compiler sees the case keyword in front of a class it has these effects and benefits:
+• Case class constructor parameters are public val fields by default, so the fields are immutable, and accessor methods are generated for each parameter.
+• An unapply method is generated, which lets you use case classes in more ways in match expressions.
+• A copy method is generated in the class. This provides a way to create updated copies of the object without changing the original object.
+• equals and hashCode methods are generated to implement structural equality.
+• A default toString method is generated, which is helpful for debugging.
+You can manually add all of those methods to a class yourself, but since those features are so commonly used in functional programming, using a case class is much more convenient.
+This code demonstrates several case class features:
+
+// define a case class 
+case class Person( name: String, vocation: String )
+
+// create an instance of the case class 
+val p = Person("Reginald Kenneth Dwight", "Singer")
+
+// a good default toString method 
+p        
+// : Person = Person(Reginald Kenneth Dwight,Singer)
+
+// can access its fields, which are immutable 
+p.name
+// "Reginald Kenneth Dwight"
+
+p.name = "Joe" 
+// error: can’t reassign a val field
+
+// when you need to make a change, use the `copy` method 
+// to “update as you copy” 
+val p2 = p.copy(name = "Elton John") 
+
+p2 
+// : Person = Person(Elton John,Singer)
